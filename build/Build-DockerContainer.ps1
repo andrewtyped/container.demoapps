@@ -43,6 +43,6 @@ Write-Host "Moving DockerFile to artifact path $ArtifactPath..."
 
 Copy-Item -Path "$DockerFilePath/Dockerfile" -Destination $ArtifactPathParent -Force
 
-& docker buildx build -t $ImageTag --build-arg "artifactStagingPath=$ArtifactPath" $ArtifactPathParent
+& docker buildx build -t $ImageTag $ArtifactPathParent
 
 & docker push $ImageTag
