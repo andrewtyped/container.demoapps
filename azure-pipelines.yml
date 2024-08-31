@@ -1,0 +1,69 @@
+variables:
+  - group: GCloud_Variables
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: DownloadSecureFile@1
+            name: Get_Gcloud_Auth_Key
+            inputs:
+              secureFile: virtual-transit-432200-s6-060054f94c91.json
+              
+          - task: UseDotNet@2
+            name: GetDotNet
+            inputs:
+              version: '8.x'
+
+          - task: DotNetCoreCLI@2
+            name: Build_Sln
+            inputs:
+              projects: '$(Build.SourcesDirectory)/dotnet/dotnet.sln'
+
+          - task: DotNetCoreCLI@2
+            name: Publish_Ping
+            inputs:
+              projects: '$(Build.SourcesDirectory)/dotnet/ping/ping.csproj'
+              arguments: -o .\$(Build.ArtifactStagingDirectory)/ping/ --no-build -c Release --no-self-contained
+              zipAfterPublish: false
+
+          - task: PowerShell@2
+            name: Containerize_Ping
+            env:
+              DOCKERFILE_PATH: $(Build.SourcesDirectory)/dotnet/ping
+              DOCKER_IMAGE_NAME: dotnet-ping
+              DOCKER_IMAGE_TAG: $(Build.BuildNumber)
+              GCLOUD_LOCATION: $(Gcloud_Location)
+              GCLOUD_PROJECT: $(Gcloud_Project)
+              GCLOUD_ARTIFACT_REGISTRY_REPO: $(GCloud_Artifact_Registry_Repo)
+              GCLOUD_AUTH_KEY_FILE_PATH:  $(Get_Gcloud_Auth_Key.secureFilePath)
+            inputs:
+              pwsh: true
+              targetType: filePath
+              filePath: $(Build.SourcesDirectory)/build/Build-DockerContainer.ps1
+
+          - task: DotNetCoreCLI@2
+            name: Publish_Pong
+            inputs:
+              projects: '$(Build.SourcesDirectory)/dotnet/pong/pong.csproj'
+              arguments: -o .\$(Build.ArtifactStagingDirectory)/pong/ --no-build -c Release --no-self-contained
+              zipAfterPublish: false
+
+          - task: PowerShell@2
+            name: Containerize_Pong
+            env:
+              DOCKERFILE_PATH: $(Build.SourcesDirectory)/dotnet/pong
+              DOCKER_IMAGE_NAME: dotnet-pong
+              DOCKER_IMAGE_TAG: $(Build.BuildNumber)
+              GCLOUD_LOCATION: $(Gcloud_Location)
+              GCLOUD_PROJECT: $(Gcloud_Project)
+              GCLOUD_ARTIFACT_REGISTRY_REPO: $(GCloud_Artifact_Registry_Repo)
+              GCLOUD_AUTH_KEY_FILE_PATH:  $(Get_Gcloud_Auth_Key.secureFilePath)
+            inputs:
+              pwsh: true
+              targetType: filePath
+              filePath: $(Build.SourcesDirectory)/build/Build-DockerContainer.ps1
+                
