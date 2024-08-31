@@ -34,6 +34,7 @@ stages:
           - task: PowerShell@2
             name: Containerize_Ping
             env:
+              ARTIFACT_PATH: $(Build.ArtifactStagingDirectory)/ping/
               DOCKERFILE_PATH: $(Build.SourcesDirectory)/dotnet/ping
               DOCKER_IMAGE_NAME: dotnet-ping
               DOCKER_IMAGE_TAG: $(Build.BuildNumber)
@@ -57,6 +58,7 @@ stages:
           - task: PowerShell@2
             name: Containerize_Pong
             env:
+              ARTIFACT_PATH: $(Build.ArtifactStagingDirectory)/pong/
               DOCKERFILE_PATH: $(Build.SourcesDirectory)/dotnet/pong
               DOCKER_IMAGE_NAME: dotnet-pong
               DOCKER_IMAGE_TAG: $(Build.BuildNumber)

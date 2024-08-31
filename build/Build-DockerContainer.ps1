@@ -1,5 +1,8 @@
 [CmdletBinding()]
 param(
+    [Parameter()]
+    [string]$ArtifactPath = $Env:ARTIFACT_PATH,
+
     [string]
     [Parameter()]
     $DockerFilePath = $Env:DOCKERFILE_PATH,
@@ -34,6 +37,6 @@ $DockerLoginUrl = "https://$DockerRepoDomain"
 Get-Content -Path $GcloudAuthKeyFilePath | 
   docker login -u _json_key --password-stdin $DockerLoginUrl
 
-& docker buildx build -t $ImageTag $DockerFilePath
+& docker buildx build -t $ImageTag $DockerFilePath --build-arg "artifactStagingPath=$ArtifactPath"
 
 & docker push $ImageTag
