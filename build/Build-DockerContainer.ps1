@@ -37,6 +37,12 @@ $DockerLoginUrl = "https://$DockerRepoDomain"
 Get-Content -Path $GcloudAuthKeyFilePath | 
   docker login -u _json_key --password-stdin $DockerLoginUrl
 
-& docker buildx build -t $ImageTag --build-arg "artifactStagingPath=$ArtifactPath" $DockerFilePath
+$ArtifactPathParent = Split-Path -Path $ArtifactPath -Parent
+
+Write-Host "Moving DockerFile to artifact path $ArtifactPath..."
+
+Copy-Item -Path "$DockerFilePath/Dockerfile" -Destination $ArtifactPathParent -Force
+
+& docker buildx build -t $ImageTag --build-arg "artifactStagingPath=$ArtifactPath" $ArtifactPathParent
 
 & docker push $ImageTag
