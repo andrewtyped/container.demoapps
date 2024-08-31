@@ -43,6 +43,14 @@ Write-Host "Moving DockerFile to artifact path $ArtifactPath..."
 
 Copy-Item -Path "$DockerFilePath/Dockerfile" -Destination $ArtifactPathParent -Force
 
+Write-Host 'Listing contents of artifact path...'
+
+Get-ChildItem -Path $ArtifactPathParent -Recurse
+
+Write-Host 'Reading dockerfile contents...'
+
+Get-Content "$ArtifactPathParent/Dockerfile"
+
 & docker buildx build -t $ImageTag $ArtifactPathParent
 
 & docker push $ImageTag

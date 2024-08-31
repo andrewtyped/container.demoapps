@@ -1,4 +1,6 @@
 variables:
+  - name: System.Debug
+    value: true
   - group: GCloud_Variables
 
 stages:
