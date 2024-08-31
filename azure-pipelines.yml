@@ -27,8 +27,9 @@ stages:
             name: Publish_Ping
             inputs:
               projects: '$(Build.SourcesDirectory)/dotnet/ping/ping.csproj'
-              arguments: -o .\$(Build.ArtifactStagingDirectory)/ping/ --no-build -c Release --no-self-contained
+              arguments: -o .\$(Build.ArtifactStagingDirectory)/ping/ -c Release --no-self-contained
               zipAfterPublish: false
+              nobuild: true
 
           - task: PowerShell@2
             name: Containerize_Ping
@@ -49,8 +50,9 @@ stages:
             name: Publish_Pong
             inputs:
               projects: '$(Build.SourcesDirectory)/dotnet/pong/pong.csproj'
-              arguments: -o .\$(Build.ArtifactStagingDirectory)/pong/ --no-build -c Release --no-self-contained
+              arguments: -o .\$(Build.ArtifactStagingDirectory)/pong/ -c Release --no-self-contained
               zipAfterPublish: false
+              nobuild: true
 
           - task: PowerShell@2
             name: Containerize_Pong
